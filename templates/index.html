@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        /* Genel stil ayarları */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        #chat-container {
+            height: 100%;
+            width: 50%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        #chat-box {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #user-input {
+            width: calc(100% - 80px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 70px;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        #loading {
+            display: none;
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: #d1ecf1;
+            color: #0c5460;
+            text-align: right;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background-color: #e2e3e5;
+            color: #383d41;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-box"></div>
+        <input type="text" id="user-input" placeholder="Soru sorun...">
+        <button onclick="sendMessage()">Gönder</button>
+        <div id="loading">Eflatun yazıyor...</div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            const chatBox = document.getElementById('chat-box');
+            const loading = document.getElementById('loading');
+
+            if (userInput.trim() === '') return;
+
+            // Göstergeyi başlat
+            loading.style.display = 'block';
+
+            // Kullanıcı mesajını ekleyin
+            chatBox.innerHTML += `<div class="message user-message">${userInput}</div>`;
+
+            try {
+                const response = await fetch('http://localhost:3000/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: userInput }),
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    // Yanıtı ekleyin
+                    chatBox.innerHTML += `<div class="message bot-message">Eflatun: ${data.answer}</div>`;
+                } else {
+                    chatBox.innerHTML += `<div class="message bot-message">Eflatun: Bir sorun oluştu, lütfen tekrar deneyin.</div>`;
+                }
+            } catch (error) {
+                chatBox.innerHTML += `<div class="message bot-message">Eflatun: Bir hata oluştu. Lütfen tekrar deneyin.</div>`;
+            } finally {
+                // Göstergeyi gizle
+                loading.style.display = 'none';
+            }
+
+            // Girdi alanını temizle
+            document.getElementById('user-input').value = '';
+
+            // Chatbox'ı otomatik olarak en alta kaydır
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
