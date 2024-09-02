@@ -149,7 +149,7 @@ app = Flask(__name__)
 CORS(app)  # CORS'u burada etkinleştiriyoruz
 
 # PDF dosyasının yolu ve vector store'ü başlat
-file_path = "C:/Users/Eyüp/Desktop/veri.pdf"  # PDF dosyasının yolu
+file_path = "./data/data1.pdf"  # PDF dosyasının yolu
 raw_text = extract_text_from_pdf(file_path)
 text_chunks = get_text_chunks(raw_text)
 vector_store = get_vector_store(text_chunks)
