@@ -1,0 +1,8 @@
+flask
+flask-cors
+pypdf2
+nltk
+langchain
+langchain_google_genai
+google-generativeai
+python-dotenv
