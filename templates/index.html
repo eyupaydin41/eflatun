@@ -4,107 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* Genel stil ayarları */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
         #chat-container {
-            height: 100%;
-            width: 50%;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         #chat-box {
-            height: 300px;
+            flex-grow: 1;
+            padding: 20px;
             overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
             background-color: #f9f9f9;
             display: flex;
             flex-direction: column;
         }
 
-        #user-input {
-            width: calc(100% - 80px);
+        #chat-input {
+            display: flex;
+            border-top: 1px solid #ddd;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            background-color: #fff;
         }
 
-        button {
-            width: 70px;
+        #user-input {
+            flex-grow: 1;
             padding: 10px;
             border: none;
             border-radius: 4px;
-            background-color: #28a745;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
             color: white;
+            font-size: 14px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         button:hover {
-            background-color: #218838;
+            background-color: #0056b3;
         }
 
         #loading {
-            display: none;
+            display: block;
             font-style: italic;
             color: #666;
-            margin-top: 10px;
         }
 
         .message {
             margin-bottom: 10px;
-            padding: 5px;
-            border-radius: 5px;
-            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 70%;
+            line-height: 1.4;
+            font-size: 14px;
         }
 
         .user-message {
             align-self: flex-end;
-            background-color: #d1ecf1;
-            color: #0c5460;
-            text-align: right;
+            background-color: #007bff;
+            color: white;
         }
 
         .bot-message {
             align-self: flex-start;
             background-color: #e2e3e5;
             color: #383d41;
-            text-align: left;
         }
     </style>
 </head>
 <body>
     <div id="chat-container">
         <div id="chat-box"></div>
-        <input type="text" id="user-input" placeholder="Soru sorun...">
-        <button onclick="sendMessage()">Gönder</button>
+        <div id="chat-input">
+            <input type="text" id="user-input" placeholder="Soru sorun..." onkeydown="handleEnter(event)">
+            <button onclick="sendMessage()">Gönder</button>
+        </div>
         <div id="loading">Eflatun yazıyor...</div>
     </div>
 
     <script>
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
         async function sendMessage() {
-            const userInput = document.getElementById('user-input').value;
+            const userInput = document.getElementById('user-input').value.trim();
             const chatBox = document.getElementById('chat-box');
             const loading = document.getElementById('loading');
 
-            if (userInput.trim() === '') return;
+            if (userInput === '') return;
 
             // Göstergeyi başlat
             loading.style.display = 'block';
 
             // Kullanıcı mesajını ekleyin
             chatBox.innerHTML += `<div class="message user-message">${userInput}</div>`;
+
+            // Girdi alanını temizle
+            document.getElementById('user-input').value = '';
 
             try {
                 const response = await fetch('http://localhost:3000/ask', {
@@ -129,8 +155,6 @@
                 loading.style.display = 'none';
             }
 
-            // Girdi alanını temizle
-            document.getElementById('user-input').value = '';
 
             // Chatbox'ı otomatik olarak en alta kaydır
             chatBox.scrollTop = chatBox.scrollHeight;
